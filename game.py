@@ -61,17 +61,16 @@ def draw_board(board, tile_size, buffer, turn, moves, shoot):
 ################################################################################
 ################################################################################
 
+buffer = 100
+tile_size = 60
 
 pygame.init()
-game_display = pygame.display.set_mode((1200,1200))
+game_display = pygame.display.set_mode((2*buffer+10*tile_size,2*buffer+10*tile_size))
 game_display.fill((255,255,255))
 
 board = Board()
 board.create_board()
 #board.print_board()
-
-buffer = 100
-tile_size = 100
 
 running = True
 
