@@ -5,6 +5,9 @@ from utility.flame import Flame
 
 
 def draw_board(board, tile_size, buffer, turn, moves, shoot):
+    flame_image = pygame.image.load('./utility/flame.png')
+    blue_player = pygame.image.load('./utility/blue_player.png')
+    green_player = pygame.image.load('./utility/green_player.png')
 
     game_display.fill((255,255,255))
 
@@ -27,13 +30,17 @@ def draw_board(board, tile_size, buffer, turn, moves, shoot):
         for row in range(10):
             index = row + (col)*10
             if not board.game_tiles[index].to_string() == '-':
-                center = (int(buffer+(tile_size*(int(row)+0.5))), int(buffer+(tile_size*(int(col)+0.5))))
+                #center = (int(buffer+(tile_size*(int(row)+0.5))), int(buffer+(tile_size*(int(col)+0.5))))
+                top_left = (int(buffer+(tile_size*(int(row)))), int(buffer+(tile_size*(int(col)))))
                 if board.game_tiles[index].alliance == 1:
-                    pygame.draw.circle(game_display, (0,0,255), center, piece_radius, piece_radius)
+                    game_display.blit(blue_player, top_left)
+                    #pygame.draw.circle(game_display, (0,0,255), center, piece_radius, piece_radius)
                 elif board.game_tiles[index].alliance == 2:
-                    pygame.draw.circle(game_display, (0,255,0), center, piece_radius, piece_radius)
+                    game_display.blit(green_player, top_left)
+                    #pygame.draw.circle(game_display, (0,255,0), center, piece_radius, piece_radius)
                 elif board.game_tiles[index].alliance == 0:
-                    pygame.draw.circle(game_display, (255,0,0), center, piece_radius, piece_radius)
+                    game_display.blit(flame_image, top_left)
+                    #pygame.draw.circle(game_display, (255,0,0), center, piece_radius, piece_radius)
                 else:
                     pass
 
@@ -66,13 +73,14 @@ tile_size = 60
 
 pygame.init()
 game_display = pygame.display.set_mode((2*buffer+10*tile_size,2*buffer+10*tile_size))
+pygame.display.set_caption('Game of the Amazons')
 game_display.fill((255,255,255))
 
 board = Board()
 board.create_board()
 #board.print_board()
 
-running = True
+run_game = True
 
 # Mouse positions
 mx, my = pygame.mouse.get_pos()
@@ -84,10 +92,10 @@ moves = None
 shoot = None
 moved = False
 
-while running:
+while run_game:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            run_game = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
 
