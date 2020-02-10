@@ -3,6 +3,13 @@ from utility.board import Board
 from utility.null import Null
 from utility.flame import Flame
 
+def check_end_game(board, turn):
+    for key in board.game_tiles:
+        if board.game_tiles[key].to_string() == str(turn):
+            moves = board.game_tiles[key].find_moves(board)
+            if moves != []:
+                return False
+    return True
 
 def draw_board(board, tile_size, buffer, turn, moves, shoot):
     flame_image = pygame.image.load('./utility/flame.png')
@@ -91,11 +98,24 @@ turn = '1'
 moves = None
 shoot = None
 moved = False
+winner = False
 
 while run_game:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run_game = False
+
+    if winner:
+        if turn == '1':
+            myfont = pygame.font.SysFont('Comic Sans MS', 60)
+            textsurface = myfont.render('Blue wins', False, (0, 0, 0))
+            game_display.blit(textsurface, (int(buffer+(5*tile_size)-60), int((1.5*buffer)+(10*tile_size))))
+        else:
+            myfont = pygame.font.SysFont('Comic Sans MS', 60)
+            textsurface = myfont.render('Green wins', False, (0, 0, 0))
+            game_display.blit(textsurface, (int(buffer+(5*tile_size)-60), int((1.5*buffer)+(10*tile_size))))
+
+    else:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -154,7 +174,7 @@ while run_game:
                         # highlight legal moves
                         moves = board.game_tiles[selected_piece].find_moves(board)
 
-
+                winner= check_end_game(board, turn)
 
     # Blit background and board
     draw_board(board, tile_size, buffer, turn, moves, shoot)
