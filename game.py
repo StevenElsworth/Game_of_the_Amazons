@@ -1,15 +1,13 @@
 import pygame
+import time
 from utility.board import Board
 from utility.null import Null
 from utility.flame import Flame
 
-def check_end_game(board, turn):
-    for key in board.game_tiles:
-        if board.game_tiles[key].to_string() == str(turn):
-            moves = board.game_tiles[key].find_moves(board)
-            if moves != []:
-                return False
-    return True
+def mouse_index(mx, my, buffer, tile_size):
+    s_row = (my - buffer)//tile_size
+    s_col = (mx - buffer)//tile_size
+    return s_col + s_row*10
 
 def draw_board(board, tile_size, buffer, turn, moves, shoot):
     flame_image = pygame.image.load('./utility/flame.png')
@@ -63,29 +61,18 @@ def draw_board(board, tile_size, buffer, turn, moves, shoot):
             location = (int(buffer+ tile_size*(s%10 + 0.5)), int(buffer+ tile_size*(s//10 + 0.5)))
             pygame.draw.circle(game_display, (255,0,0), location, 5, 5)
 
-
-    myfont = pygame.font.SysFont('Comic Sans MS', 60)
-    if turn == '1':
-        textsurface = myfont.render('Blue', False, (0, 0, 0))
-    else:
-        textsurface = myfont.render('Green', False, (0, 0, 0))
-
-    game_display.blit(textsurface, (int(buffer+(5*tile_size)-60), int((1.5*buffer)+(10*tile_size))))
-
 ################################################################################
 ################################################################################
 
-buffer = 100
+buffer = 0
 tile_size = 60
 
 pygame.init()
 game_display = pygame.display.set_mode((2*buffer+10*tile_size,2*buffer+10*tile_size))
 pygame.display.set_caption('Game of the Amazons')
-game_display.fill((255,255,255))
 
 board = Board()
 board.create_board()
-#board.print_board()
 
 run_game = True
 
@@ -100,20 +87,10 @@ shoot = None
 moved = False
 winner = False
 
-while run_game:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+while run_game: # begin running game
+    for event in pygame.event.get(): # Did user press a key
+        if event.type == pygame.QUIT: # If window close button, end game
             run_game = False
-
-    if winner:
-        if turn == '1':
-            myfont = pygame.font.SysFont('Comic Sans MS', 60)
-            textsurface = myfont.render('Blue wins', False, (0, 0, 0))
-            game_display.blit(textsurface, (int(buffer+(5*tile_size)-60), int((1.5*buffer)+(10*tile_size))))
-        else:
-            myfont = pygame.font.SysFont('Comic Sans MS', 60)
-            textsurface = myfont.render('Green wins', False, (0, 0, 0))
-            game_display.blit(textsurface, (int(buffer+(5*tile_size)-60), int((1.5*buffer)+(10*tile_size))))
 
     else:
 
@@ -124,9 +101,7 @@ while run_game:
 
                 # Find index of pressed tile
                 mx, my = pygame.mouse.get_pos()
-                s_row = (my - buffer)//tile_size
-                s_col = (mx - buffer)//tile_size
-                index = s_col + s_row*10
+                index = mouse_index(mx, my, buffer, tile_size)
 
                 # Check if its a warrior
                 if board.game_tiles[index].to_string() == turn:
@@ -138,13 +113,15 @@ while run_game:
             else:
                 # Find index of pressed tile
                 mx, my = pygame.mouse.get_pos()
-                s_row = (my - buffer)//tile_size
-                s_col = (mx - buffer)//tile_size
-                index = s_col + s_row*10
+                index = mouse_index(mx, my, buffer, tile_size)
 
                 if moved: # (Ready to shoot)
                     if index in shoot and board.game_tiles[index].to_string() == '-':
-                        print('shot fired')
+                        if turn == '1':
+                            pygame.display.set_caption('Game of the Amazons - Shots fired by green!')
+                        else:
+                            pygame.display.set_caption('Game of the Amazons - Shots fired by blue!')
+
                         board.game_tiles[index] = Flame(0, index)
                         shoot = None
                         selected_piece = None
@@ -158,7 +135,7 @@ while run_game:
                         board.game_tiles[selected_piece] = Null(None, None)
                         moved = True
 
-                        # Moved character, must now shoot.
+                        # Moved character must now shoot
                         shoot = board.game_tiles[index].find_moves(board)
 
                         # Change turns
@@ -174,11 +151,8 @@ while run_game:
                         # highlight legal moves
                         moves = board.game_tiles[selected_piece].find_moves(board)
 
-                winner= check_end_game(board, turn)
-
-    # Blit background and board
+    # Draw board
     draw_board(board, tile_size, buffer, turn, moves, shoot)
-    game_display.blit(game_display, (0, 0))
     pygame.display.flip()
 
 pygame.quit()
