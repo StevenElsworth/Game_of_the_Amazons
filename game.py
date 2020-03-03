@@ -61,31 +61,34 @@ def draw_board(board, tile_size, buffer, turn, moves, shoot):
             location = (int(buffer+ tile_size*(s%10 + 0.5)), int(buffer+ tile_size*(s//10 + 0.5)))
             pygame.draw.circle(game_display, (255,0,0), location, 5, 5)
 
-################################################################################
-################################################################################
 
-buffer = 0
-tile_size = 60
 
-pygame.init()
+# play game
+
+buffer = 0     # border size from game board
+tile_size = 60 # size of game tiles
+
+pygame.init() # initialize the game
 game_display = pygame.display.set_mode((2*buffer+10*tile_size,2*buffer+10*tile_size))
+# sets the size of the screen which displays the game board and buffer
 pygame.display.set_caption('Game of the Amazons')
+# caption display at top of screen (game name)
 
-board = Board()
-board.create_board()
+board = Board() # generate Board object
+board.create_board() # generate initial game board
 
-run_game = True
+run_game = True # boolean flag for game (see while loop below)
 
-# Mouse positions
-mx, my = pygame.mouse.get_pos()
+mx, my = pygame.mouse.get_pos() # get x and y coordinates of mouse click
 prevx, prevy = [0,0]
 
 selected_piece = None
-turn = '1'
-moves = None
-shoot = None
-moved = False
-winner = False
+turn           = '1'
+moves          = None
+shoot          = None
+moved          = False
+winner         = False
+
 
 while run_game: # begin running game
     for event in pygame.event.get(): # Did user press a key
@@ -97,46 +100,59 @@ while run_game: # begin running game
         if event.type == pygame.MOUSEBUTTONDOWN:
 
 
-            if selected_piece == None: #(No piece selected)
+            if selected_piece == None: # No piece selected
 
-                # Find index of pressed tile
-                mx, my = pygame.mouse.get_pos()
-                index = mouse_index(mx, my, buffer, tile_size)
+                mx, my = pygame.mouse.get_pos() # find index of pressed tile
+                index = mouse_index(mx, my, buffer, tile_size) # find tile index
 
-                # Check if its a warrior
+                # Check if its a Warrior
                 if board.game_tiles[index].to_string() == turn:
                     selected_piece = index
+                    # selected_piece is now the index of a Warrior
 
-                    # highlight legal moves
                     moves = board.game_tiles[selected_piece].find_moves(board)
+                    # highlight legal moves
 
             else:
-                # Find index of pressed tile
-                mx, my = pygame.mouse.get_pos()
-                index = mouse_index(mx, my, buffer, tile_size)
+                mx, my = pygame.mouse.get_pos() # find index of pressed tile
+                index = mouse_index(mx, my, buffer, tile_size) # find tile index
 
-                if moved: # (Ready to shoot)
+                # Tile index now found, we move onto moving and shooting
+
+
+                if moved: # move has now happened so lets assign fire to shoot location (Ready to shoot)
                     if index in shoot and board.game_tiles[index].to_string() == '-':
-                        if turn == '1':
+
+                        board.game_tiles[index] = Flame(0, index)
+                        # assign Flame object to location which has been shot
+                        shoot = None
+                        # recycle shoot for next turn
+                        selected_piece = None
+                        # recycle selected_piece for next turn
+                        moved = False
+                        # recycle moved for next turn
+                        if turn == '1': # update caption to let user know whos turn it is
                             pygame.display.set_caption('Game of the Amazons - Shots fired by green!')
                         else:
                             pygame.display.set_caption('Game of the Amazons - Shots fired by blue!')
 
-                        board.game_tiles[index] = Flame(0, index)
-                        shoot = None
-                        selected_piece = None
-                        moved = False
+                else: # move has not been completed, else statement either select new character or moves
 
-                else: # (Select new character or move)
-                    if index in moves and board.game_tiles[index].to_string() == '-': #(Move)
-                        moving_piece = board.game_tiles[selected_piece]
+                    if index in moves and board.game_tiles[index].to_string() == '-': # both conditions ensure valid move
+                        moving_piece          = board.game_tiles[selected_piece]
+                        # get Warrior object
                         moving_piece.position = index
+                        # assign position attribute to index of Warrior
                         board.game_tiles[index] = moving_piece
+                        # assign Warrior object on game board to proposed location
+                        # using index
                         board.game_tiles[selected_piece] = Null(None, None)
+                        # generate empty tile for where Warrior was before moving
                         moved = True
+                        # move is now complete. Onto shooting from move...
 
-                        # Moved character must now shoot
                         shoot = board.game_tiles[index].find_moves(board)
+                        # finds possible moves from new Warrior location
 
                         # Change turns
                         if turn == '1':
@@ -145,14 +161,15 @@ while run_game: # begin running game
                             turn = '1'
                         moves = None
 
-                    elif board.game_tiles[index].to_string() == turn: #(Select new character)
+                    elif board.game_tiles[index].to_string() == turn:
+                        # if user doesn't presses another Warrior on same team
                         selected_piece = index
-
-                        # highlight legal moves
+                        # selected_piece is the index of other Warrior
                         moves = board.game_tiles[selected_piece].find_moves(board)
-
+                        # give possible moves from different Warrior
     # Draw board
     draw_board(board, tile_size, buffer, turn, moves, shoot)
     pygame.display.flip()
 
 pygame.quit()
+# closes window after while loop condition is violated
