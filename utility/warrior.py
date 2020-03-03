@@ -4,17 +4,16 @@ class Warrior(object):
     position = None
 
     def __init__(self, alliance, position):
-        self.alliance = alliance
-        self.position = position
+        self.alliance       = alliance
+        self.position       = position
 
     def to_string(self):
         return "1" if self.alliance==1 else "2"
 
     def find_moves(self, board):
         # List of all one step moves (directions)
-        possible_steps = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
         moves = []
-        for step in possible_steps:
+        for step in board.possible_steps:
             pos = self.position
             # Convert to cartesian
             x = pos%10
