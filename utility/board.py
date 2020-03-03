@@ -6,7 +6,7 @@ class Board:
     game_tiles = {}
 
     def __init__(self):
-        pass
+        self.possible_steps = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
 
     def create_board(self):
         # Fill board with nulls
