@@ -1,11 +1,10 @@
 import pygame
-from utility.game_backend import Game
+from utility.game_backend import Game, Board, Null, Flame, Warrior 
 
 def mouse_index(mx, my, buffer, tile_size):
     s_row = (my - buffer)//tile_size
     s_col = (mx - buffer)//tile_size
     return s_col + s_row*10
-
 def draw_board(buffer, tile_size, game, piece, move, move_locations, shoot_locations):
 
     flame_image = pygame.image.load('./utility/flame.png')
@@ -60,15 +59,18 @@ def draw_board(buffer, tile_size, game, piece, move, move_locations, shoot_locat
         for s in shoot_locations:
             location = (int(buffer+ tile_size*(s%10 + 0.5)), int(buffer+ tile_size*(s//10 + 0.5)))
             pygame.draw.circle(game_display, (255,0,0), location, 5, 5)
-
+    return
 
 if __name__ == '__main__':
-    buffer = 50     # border size from game board
+    buffer    = 50  # border size from game board
     tile_size = 60  # size of game tiles
 
     pygame.init() # initialize the game
-    game_display = pygame.display.set_mode((2*buffer+10*tile_size,2*buffer+10*tile_size)) # sets the size of the screen which displays the game board and buffer
-    pygame.display.set_caption('Game of the Amazons') # caption display at top of screen (game name)
+    game_display = pygame.display.set_mode((2*buffer+10*tile_size,2*buffer+ \
+    10*tile_size))
+    # sets the size of the screen which displays the game board and buffer
+    pygame.display.set_caption('Game of the Amazons')
+    # caption display at top of screen (game name)
 
     g = Game()
     run_game = True # boolean flag for game (see while loop below)
