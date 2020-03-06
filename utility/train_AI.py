@@ -122,6 +122,52 @@ def data_to_board(data):
     pass
 
 
+# Need to modify network for our input size of dimension 10 x 10 x 4
+
+
+# Monte Carlo Search Tree
+
+class Node(object):
+    def __init__(self, game, available_moves, parent=None):
+        self.game = game # This is a game state
+        self.available_moves = available_moves # List of available moves to advance this state
+        self.parent = parent # The node in which this node was created from
+
+        self.expanded = False
+
+        self.children = {}
+        self.child_prior_distribution = []
+
+    def select_leaf(self):
+        current = self
+        while current.expanded:
+            best_move = current.best_child() #Find best child
+            current = current.add_child(best_move) # Add best child?
+
+    def expand(self, child_prior_distribution):
+        """
+        Expand a Node, i.e add children
+        """
+        self.expanded = True
+
+        c_p = child_prior_distribution
+
+        # Remove all illegal moves
+        for i in range(len(child_prior_distribution)):
+            if i not in self.available_moves: # Create an index of all availabel moves and check against prior
+                c_p[i] = 0
+
+        # Add dirichlet noise
+        if self.parent.parent == None:
+            # Add Dirichlet noise if the node is a root node to provide randomness to exploration. Hopefully make each MCTS simulation very different.
+            c_p = self.add_dirichlet_noise(self.available_moves, c_p)
+
+        self.child_prior_distribution = c_p
+
+
+
+
+
 
 # https://towardsdatascience.com/from-scratch-implementation-of-alphazero-for-connect4-f73d4554002a
 # https://github.com/plkmo/AlphaZero_Connect4
