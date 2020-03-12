@@ -1,6 +1,7 @@
 from game_backend import Game
 import torch
 import numpy as np
+import copy
 
 class InitialConvolutionBlock(torch.nn.Module):
     """
@@ -137,6 +138,7 @@ class Node(object):
 
         self.children = {}
         self.child_prior_distribution = []
+        self.visits = 0
 
     def select_leaf(self):
         current = self
@@ -163,6 +165,72 @@ class Node(object):
             c_p = self.add_dirichlet_noise(self.available_moves, c_p)
 
         self.child_prior_distribution = c_p
+
+    def backup(self, value):
+        current = self
+        while current.parent is not None:
+            current.number_visits += 1
+            if current.game.turn == '1':
+                current.total_value += value
+            else:
+                current.total_value -= value
+
+            current = current.parent
+
+def Node_search(game_state, num_reads, neural_network, temp):
+    root = Node(game_state, move=None, parent=None)
+    for _ in range(num_reads):
+        leaf = root.select_leaf()
+        data = board_to_data(leaf.game)
+
+        priors, value = neural_network(data)
+
+        if leaf.game == 'winner': ## Fix This
+            leaf.backup(value)
+        else:
+            leaf.expand(priors)
+            leaf.backup(value)
+    return root
+
+def MonteCarloTreeSearch(Network, number_of_games):
+    for _ in range(number_of_games):
+        # Create a brand new game
+        current_game = Game()
+
+        # Create lists to store information
+        dataset = []
+        states = []
+
+        value = 0
+
+        available_moves = current_game.find_available_plays()
+        while available_moves != []:
+            states.append(copy.deepcopy(current_game.Board()))
+
+            root = Node_search(current_game, 1000, Network)
+
+            # Currently no temperature included
+            policy =  root.visits/sum(root.child_number_visits)
+
+            # Make play according to policy
+            index = np.random.choice(np.arange(0, len(available_moves)), policy)
+            piece, move, shoot = available_moves[index]
+            current_game.make_play(piece, move, shoot)
+
+            if current_game.winner():
+                if current_game.turn == '1': # player 1 wins
+                    value = -1
+                elif current_game.turn == '2': # player 2 wins
+                    value = 1
+
+            # Store info
+            dataset.append([states[-1], policy, value])
+
+
+def run(iteration=0):
+
+    Network = AmazonNet()
+
 
 
 
