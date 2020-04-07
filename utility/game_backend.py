@@ -76,15 +76,6 @@ class Game:
 
             self.make_play(p, m, s)
 
-class Flame:
-
-    def __init__(self, alliance=None, position=None):
-        self.alliance = alliance
-        self.position = position
-
-    def to_string(self):
-        return '0'
-
 class Board:
     def __init__(self):
         self.possible_steps = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
@@ -121,6 +112,15 @@ class Null:
 
     def to_string(self):
         return "-"
+
+class Flame:
+
+    def __init__(self, alliance=None, position=None):
+        self.alliance = alliance
+        self.position = position
+
+    def to_string(self):
+        return '0'
 
 class Warrior:
 
