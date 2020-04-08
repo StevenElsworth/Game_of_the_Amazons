@@ -59,14 +59,18 @@ This class represents the locations hit by a fire arrow. This object has no alli
 
 5. Null
 
-  This class represents locations which have neither a warrior object nor a fire object on them. This piece has no alliance and prints the string '-' when called.
+  This class represents locations which have neither a warrior object nor a fire object on them. This object has no alliance and prints the string '-' when called.
 
 
 ## To Do
 - Add AI to play against user. Train using AlphaZero reinforcement learning (see below)
 - Generalise the size of the board and the number of warriors
-- Improve the efficiency of the GUI. For example, currently the whole board is drawn each turn
+- Improve the efficiency of the GUI: e.g., currently the whole board is drawn each turn
+- Improve the appearance of the GUI: e.g., better player icons, better fire icon (GIF?), grey-out warriors when they have zero available moves, more information in text
+- Improve the features of the GUI: e.g., add undo button
 - Implement endgame routine once a player has won
+- Autocomplete function to end game?
+- Undo button in GUI
 
 
 ## AlphaZero Reinforcement Learning
