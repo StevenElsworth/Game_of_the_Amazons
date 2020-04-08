@@ -17,10 +17,9 @@ The core of the game is implemented in the file utility/game_backend.py which co
     ```python
     available_plays[warrior_location][move_location] = [shoot_locations]
     ```
-
-    * check_play_is_legal: Checks if a specific play belongs to the available_plays dictionary
-    * make_play: Takes a board, piece, move, shoot combination and checks the play is legal. If the play is legal it makes the play by editing the board.
-    * play: Used to play the game in terminal. Requests a play selection from the user and calls make_play.
+    ..* check_play_is_legal: Checks if a specific play belongs to the available_plays dictionary
+    ..* make_play: Takes a board, piece, move, shoot combination and checks the play is legal. If the play is legal it makes the play by editing the board.
+    ..* play: Used to play the game in terminal. Requests a play selection from the user and calls make_play.
 
 2. Board
 
