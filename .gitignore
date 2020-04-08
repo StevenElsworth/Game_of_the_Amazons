@@ -1,1 +1,6 @@
+# SE
 utility/__pycache__
+
+# JR
+.ipynb_checkpoints/
+*.ipynb
