@@ -13,8 +13,10 @@ The core of the game is implemented in the file utility/game_backend.py which co
 1. Game
 
   The main class within this python script which controls all attributes of the game. When initialised it constructs an initial board and sets the player turn to Player 1. This class has 4 functions, make_play, check_play_is_legal, find_available_plays and play.
-    * find_available_plays: Runs through a players warriors and provides a dictionary of all available plays. A play consists of selecting a piece, a move location and a shoot location. The nested dictionary is structured as follows
-    `available_plays[warrior_location][move_location] = [shoot_locations]`
+    * find_available_plays: Runs through a players warriors and provides a dictionary of all available plays. A play consists of selecting a piece, a move location and a shoot location. The nested dictionary is structured as follows..
+    
+    ```available_plays[warrior_location][move_location] = [shoot_locations]```
+    
     * check_play_is_legal: Checks if a specific play belongs to the available_plays dictionary
     * make_play: Takes a board, piece, move, shoot combination and checks the play is legal. If the play is legal it makes the play by editing the board.
     * play: Used to play the game in terminal. Requests a play selection from the user and calls make_play.
