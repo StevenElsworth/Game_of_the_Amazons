@@ -14,8 +14,9 @@ The core of the game is implemented in the file utility/game_backend.py which co
 
   The main class within this python script which controls all attributes of the game. When initialised it constructs an initial board and sets the player turn to Player 1. This class has 4 functions, make_play, check_play_is_legal, find_available_plays and play.
     * find_available_plays: Runs through a players warriors and provides a dictionary of all available plays. A play consists of selecting a piece, a move location and a shoot location. The nested dictionary is structured as follows
-
-            available_plays[warrior_location][move_location] = [shoot_locations]
+    ```python
+    available_plays[warrior_location][move_location] = [shoot_locations]
+    ```
 
     * check_play_is_legal: Checks if a specific play belongs to the available_plays dictionary
     * make_play: Takes a board, piece, move, shoot combination and checks the play is legal. If the play is legal it makes the play by editing the board.
@@ -23,34 +24,42 @@ The core of the game is implemented in the file utility/game_backend.py which co
 
 2. Board
 
-  Stores all information about the current board. The main attribute is the game_tiles which is a list of length 100 where each entry is either a Flame, Null or Warrior object. The 100 entries correspond to the 10x10 board. The layout of the board is as follows:
+  This class stores all information about the current board. The main attribute is game_tiles which is a list of length 100 where each entry is either a Flame, Null or Warrior object. The 100 entries correspond to the 10x10 board. The layout of the board is as follows:
+
+  |     |       |       |       |       |       |       |       |       |       |     |
+  | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+  |     |    0  |    1  |    2  |    3  |    4  |    5  |    6  |    7  |    8  |    9  |
+  |     |   10  |   11  |   12  |   13  |   14  |   15  |   16  |   17  |   18  |   19  |
+  |     |   20  |   21  |   22  |   23  |   24  |   25  |   26  |   27  |   28  |   29  |
+  |     |   30  |   31  |   32  |   33  |   34  |   35  |   36  |   37  |   38  |   39  |
+  |     |   40  |   41  |   42  |   43  |   44  |   45  |   46  |   47  |   48  |   49  |
+  |     |   50  |   51  |   52  |   53  |   54  |   55  |   56  |   57  |   58  |   59  |
+  |     |   60  |   61  |   62  |   63  |   64  |   65  |   66  |   67  |   68  |   69  |
+  |     |   70  |   71  |   72  |   73  |   74  |   75  |   76  |   77  |   78  |   79  |
+  |     |   80  |   81  |   82  |   83  |   84  |   85  |   86  |   87  |   88  |   89  |
+  |     |   90  |   91  |   92  |   93  |   94  |   95  |   96  |   97  |   98  |   99  |
 
 
-  |---|---|---|---|---|---|---|---|---|---|
-  |  0|  1|  2|  3|  4|  5|  6|  7|  8|  9|
-  | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19|
-  | 20| 21| 22| 23| 24| 25| 26| 27| 28| 29|
-  | 30| 31| 32| 33| 34| 35| 36| 37| 38| 39|
-  | 40| 41| 42| 43| 44| 45| 46| 47| 48| 49|
-  | 50| 51| 52| 53| 54| 55| 56| 57| 58| 59|
-  | 60| 61| 62| 63| 64| 65| 66| 67| 68| 69|
-  | 70| 71| 72| 73| 74| 75| 76| 77| 78| 79|
-  | 80| 81| 82| 83| 84| 85| 86| 87| 88| 89|
-  | 90| 91| 92| 93| 94| 95| 96| 97| 98| 99|
+  3. Warrior
 
-Flame - This piece has no alliance and prints the string '0' when called
+    This piece has either alliance '1' or '2' dependent on which player it belongs. This class also has two extremely important functions, find_moves and find_shoots. find_moves looks for all available move locations for the particular piece given the board. It does this by looking exhaustively in each of the 9 directions. find_shoots looks at all the possible shoot locations given a specific move. There is quite a bit of overlap in the functions which could probably be simplified.
 
-Null - This piece has no alliance and prints the string '-' when called
+4. Flame
 
-Warrior - This piece has either alliance '1' or '2' dependent on which player it belongs. This class also has two extremely important functions, find_moves and find_shoots. find_moves looks for all available move locations for the particular piece given the board. It does this by looking exhaustively in each of the 9 directions. find_shoots looks at all the possible shoot locations given a specific move. There is quite a bit of overlap in the functions which could probably be simplified.
+  This piece has no alliance and prints the string '0' when called
 
-The game can be played on the command line using the game.play() function or using the python script game which has a GUI built using pygame.
+5. Null
+
+  This piece has no alliance and prints the string '-' when called
+
+
+
 
 ## AlphaZero Reinforcement Learning
 
 1) Deep convolutional neural net with residual blocks.
 
-2) Monet Carlo Tree Search Algorithm.
+2) Monte Carlo Tree Search Algorithm.
 
 3) Network discarding.
 
