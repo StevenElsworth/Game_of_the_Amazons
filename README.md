@@ -2,7 +2,7 @@
 
 
 ## Rules of the Game
-The 'Game of the Amazons' is a two player abstract strategy game invented by Walter Zamkauskas from Argentina in 1988. The game is usually played on a 10x10 grid where each player has four 'Amazon warriors' (or 'pieces').
+The 'Game of the Amazons' (see [here](https://www.chessvariants.com/other.dir/amazons.html) or [here](http://www.solitairelaboratory.com/amazons.html)) is a two player abstract strategy game invented by Walter Zamkauskas from Argentina in 1988. The game is usually played on a 10x10 grid where each player has four 'Amazon warriors' (or 'pieces').
 A turn consists of two parts. First, the player moves one of their warriors in a straight line (like a queen in a game of chess) to an empty square. Secondly, after moving, the Amazon fires a flaming arrow to another empty square using a queen-like move. The square where the arrow lands is then burning for the remainder of the game. Neither warriors nor arrows may travel through a square which is burning or occupied by another Amazon. To complete their turn, a player must be able to successfully move one of their warriors **_and_** fire an arrow. The game is won when the opponent cannot complete a legal move.
 
 
