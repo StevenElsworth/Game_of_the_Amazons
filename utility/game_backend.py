@@ -1,7 +1,9 @@
 import random
 
 class Game:
-
+    """
+    Description of Game class.
+    """
     def __init__(self):
         self.board = Board()
         self.turn = '1'
@@ -135,21 +137,25 @@ class Game:
             self.make_play(piece, move, shoot)
 
 class Board:
+    """
+    Description of Board class.
+    """
     def __init__(self, ):
+        # Possible directions of travel for pieces and arrows.
         self.possible_steps = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
-        self.game_tiles = []
 
-        # Fill the board with nulls.
+        # Initialise the board with nulls.
+        self.game_tiles = []
         for tile in range(100):
             self.game_tiles.append(Null(None, None))
 
-        # Add tribe 1
+        # Add Warriors of tribe/player 1.
         self.game_tiles[3] = Warrior(1, 3)
         self.game_tiles[6] = Warrior(1, 6)
         self.game_tiles[30] = Warrior(1, 30)
         self.game_tiles[39] = Warrior(1, 39)
 
-        # Add tribe 2
+        # Add Warriors or tribe/player 2.
         self.game_tiles[60] = Warrior(2, 60)
         self.game_tiles[69] = Warrior(2, 69)
         self.game_tiles[93] = Warrior(2, 93)
@@ -157,6 +163,9 @@ class Board:
 
 
     def print_board(self):
+        """
+        Display the game board to screen.
+        """
         for tiles in range(100):
             print('|', end=self.game_tiles[tiles].to_string())
             if (tiles+1)%10 == 0:
