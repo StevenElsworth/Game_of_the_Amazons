@@ -67,9 +67,7 @@ This class represents the locations hit by a fire arrow. This object has no alli
 - Improve the efficiency of the GUI: e.g., currently the whole board is drawn each turn
 - Improve the appearance of the GUI: e.g., better player icons, better fire icon (GIF?), grey-out warriors when they have zero available moves, more information in text
 - Improve the features of the GUI: e.g., add undo button
-- Implement endgame routine once a player has won
 - Autocomplete function to end game?
-- Undo button in GUI
 
 
 ## AlphaZero Reinforcement Learning
