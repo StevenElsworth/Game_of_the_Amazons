@@ -60,6 +60,12 @@ This class represents the locations hit by a fire arrow. This object has no alli
 
   This class represents locations which have neither a warrior object nor a fire object on them. This object has no alliance and prints the string '-' when called.
 
+## Testing
+
+Run:
+'''bash
+py.test
+'''
 
 ## To Do
 - Add AI to play against user. Train using AlphaZero reinforcement learning (see below)

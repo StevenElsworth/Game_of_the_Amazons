@@ -4,10 +4,10 @@ class Game:
     """
     Description of Game class.
     """
-    def __init__(self):
+    def __init__(self, testgame=0):
         self.board = Board()
         self.turn = '1'
-        self.testgame = 1
+        self.testgame = testgame
 
     def make_play(self, piece, move, shoot):
         """
