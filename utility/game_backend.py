@@ -131,7 +131,7 @@ class Game:
                     piece = random.choice(list(available_plays))
                     move  = random.choice(list(available_plays[piece]))
                     shoot = random.choice(available_plays[piece][move])
-                break
+                    break
 
             # Complete a valid play.
             self.make_play(piece, move, shoot)
