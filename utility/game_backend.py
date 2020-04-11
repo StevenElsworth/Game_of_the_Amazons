@@ -1,10 +1,12 @@
+# Used for randomly selecting moves in test games.
 import random
+
 
 class Game:
     """
-    Description of Game class.
+    TODO: Description of Game class.
     """
-    def __init__(self, testgame=0):
+    def __init__(self, testgame=False):
         self.board = Board()
         self.turn = '1'
         self.testgame = testgame
@@ -117,7 +119,7 @@ class Game:
 
             while True:
                 # If game is being played by user, request user input.
-                if self.testgame == 0:
+                if not self.testgame:
                     piece = int(input('Player ' + self.turn + ', select a piece:'))
                     move  = int(input('Now choose a move location:'))
                     shoot = int(input('Now choose a shoot location:'))
@@ -136,9 +138,10 @@ class Game:
             # Complete a valid play.
             self.make_play(piece, move, shoot)
 
+
 class Board:
     """
-    Description of Board class.
+    TODO: Description of Board class.
     """
     def __init__(self, ):
         # Possible directions of travel for pieces and arrows.
@@ -150,8 +153,8 @@ class Board:
             self.game_tiles.append(Null(None, None))
 
         # Add Warriors of tribe/player 1.
-        self.game_tiles[3] = Warrior(1, 3)
-        self.game_tiles[6] = Warrior(1, 6)
+        self.game_tiles[3]  = Warrior(1, 3)
+        self.game_tiles[6]  = Warrior(1, 6)
         self.game_tiles[30] = Warrior(1, 30)
         self.game_tiles[39] = Warrior(1, 39)
 
@@ -169,52 +172,50 @@ class Board:
         for tiles in range(100):
             print('|', end=self.game_tiles[tiles].to_string())
             if (tiles+1)%10 == 0:
-                print('|', end='\n')
+                print('|')
 
-class Null:
-
-    def __init__(self, alliance=None, position=None):
-        self.alliance = alliance
-        self.position = position
-
-    def to_string(self):
-        return "-"
-
-class Flame:
-
-    def __init__(self, alliance=None, position=None):
-        self.alliance = alliance
-        self.position = position
-
-    def to_string(self):
-        return '0'
 
 class Warrior:
-
+    """
+    TODO: Description of Warrior class.
+    """
     def __init__(self, alliance, position):
         self.alliance       = alliance
         self.position       = position
 
     def to_string(self):
+        """
+        Return a string indicating to which player the warrior belongs.
+        """
         return "1" if self.alliance==1 else "2"
 
     def find_moves(self, board):
         """
-        Find possible move locations
+        Find all possible move locations. ----- TODO?: Is there a faster way to do this?
         """
+        # Initialise storage for possible moves.
         moves = []
+
+        # Explore each of the 8 directions in turn.
         for step in board.possible_steps:
+            # Position of warrior object on board.
             pos = self.position
-            # Convert to cartesian
+
+            # Convert integer representation of current position to Cartesian co-ordinates.
             x = pos%10
             y = pos//10
+
+            # Explore in current step direction to the edge of the board.
             while (0 <= x <= 9) and (0 <= y <= 9):
                 x += step[0]
                 y += step[1]
                 if (0 <= x <= 9) and (0 <= y <= 9):
-                    pos2 = x + 10*y
-                    if board.game_tiles[pos2].to_string() == '-':
-                        moves.append(pos2)
+                    # Convert Cartesian co-ordinates of new positition to integer representation.
+                    new_pos = x + 10*y
+
+                    # If new position is unoccupied, add it to possible move locations.
+                    if board.game_tiles[new_pos].to_string() == '-':
+                        moves.append(new_pos)
                     else:
                         break
                 else:
@@ -223,7 +224,7 @@ class Warrior:
 
     def find_shoots(self, board, move):
         """
-        Find possible shoot locations from the position move.
+        Find all possible shoot locations from the position move.
         """
         old_position = self.position
         moves = []
@@ -244,3 +245,27 @@ class Warrior:
                 else:
                     break
         return moves
+
+
+class Flame:
+    """
+    TODO: Description of Flame class.
+    """
+    def __init__(self, alliance=None, position=None):
+        self.alliance = alliance
+        self.position = position
+
+    def to_string(self):
+        return '0'
+
+
+class Null:
+    """
+    TODO: Description of Null class.
+    """
+    def __init__(self, alliance=None, position=None):
+        self.alliance = alliance
+        self.position = position
+
+    def to_string(self):
+        return "-"
