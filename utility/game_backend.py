@@ -1,5 +1,4 @@
-# Used for randomly selecting moves in test games.
-import random
+import random # used for randomly selecting moves in test games.
 
 
 class Game:

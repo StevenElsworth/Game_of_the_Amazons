@@ -5,16 +5,35 @@ import time
 import random
 import os
 
+
 def mouse_index(mx, my, buffer, tile_size):
+    """
+    FUNCTION DESCRIPTION.
+
+    Parameters:
+    -----------
+
+    Returns:
+    --------
+    """
     s_row = (my - buffer)//tile_size
     s_col = (mx - buffer)//tile_size
     return s_col + s_row*10
 
-def draw_board(game_display, buffer, tile_size, game, piece, move, move_locations, shoot_locations):
 
-    flame_image = pygame.image.load('./utility/flame.png')
-    blue_player = pygame.image.load('./utility/blue_player.png')
-    green_player = pygame.image.load('./utility/green_player.png')
+def draw_board(game_display, buffer, tile_size, game, piece, move, move_locations, shoot_locations):
+    """
+    FUNCTION DESCRIPTION.
+
+    Parameters:
+    -----------
+
+    Returns:
+    --------
+    """
+    flame_image = pygame.image.load('./utility/flame.png')          # image of flame
+    blue_player = pygame.image.load('./utility/blue_player.png')    # image of blue warrior
+    green_player = pygame.image.load('./utility/green_player.png')  # image of green warrior
 
     game_display.fill((255,255,255))
 
@@ -66,25 +85,42 @@ def draw_board(game_display, buffer, tile_size, game, piece, move, move_location
             pygame.draw.circle(game_display, (255,0,0), location, 5, 5)
     return
 
-def main(testgame=0):
+
+def main(testgame=False):
+    """
+    FUNCTION DESCRIPTION.
+
+    Parameters:
+    -----------
+
+    Returns:
+    --------
+    """
     buffer    = 50  # border size from game board
     tile_size = 60  # size of game tiles
 
+    # Place game screen in te top left corner of the screen.
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
 
-    pygame.init() # initialize the game
+    # Initialize the game.
+    pygame.init()
     game_display = pygame.display.set_mode((2*buffer+10*tile_size,2*buffer+ \
     10*tile_size))
+    # Sets the size of the screen which displays the game board and buffer
 
-    # sets the size of the screen which displays the game board and buffer
+    # Caption display at top of screen (game name).
     pygame.display.set_caption('Game of the Amazons')
-    # caption display at top of screen (game name)
 
+    # Initialise game using class Game from backend.
     g = Game()
-    run_game = True # boolean flag for game (see while loop below)
-    mx, my = pygame.mouse.get_pos() # find index of pressed tile
 
-    # Draw initial board
+    # Boolean flag for game (see while loop below).
+    run_game = True
+
+    # Get x and y positions of the mouse cursor.
+    mx, my = pygame.mouse.get_pos()
+
+    # Draw initial board.
     draw_board(game_display, buffer, tile_size, g, None, None, [], [])
     pygame.display.flip()
 
@@ -93,41 +129,47 @@ def main(testgame=0):
     move_locations  = []
     shoot_locations = []
 
-    if testgame==1:
+    # If random/test game (no user).
+    if testgame:
         mouse = Controller()
         time.sleep(2)
 
-    while run_game: # begin running game
-        for event in pygame.event.get(): # Did user press a key
+    # Game running.
+    while run_game:
+        # Did user press a key?
+        for event in pygame.event.get():
 
-            if testgame==1:
+            # If window close button is pressed, end the game.
+            if event.type == pygame.QUIT:
+                run_game = False
+
+            # If a test game, complete a random play.
+            if testgame:
                 if piece == None:
-                    # Select random play
+                    # Select random play.
                     available_plays = g.find_available_plays()
                     r_piece = random.choice(list(available_plays))
                     r_move  = random.choice(list(available_plays[r_piece]))
                     r_shoot = random.choice(available_plays[r_piece][r_move])
 
-                    # select piece
-                    x, y = int(buffer+ tile_size*(r_piece%10 + 0.5)), int(buffer+ tile_size*(r_piece//10 + 0.5))
+                    # Select a piece.
+                    x, y = int(buffer + tile_size*(r_piece%10 + 0.5)), int(buffer + tile_size*(r_piece//10 + 0.5))
                     mouse.position = (x, y+5)
                     mouse.click(Button.left, 1)
 
                 elif piece != None and move == None:
-                    # make move
-                    x, y = int(buffer+ tile_size*(r_move%10 + 0.5)), int(buffer+ tile_size*(r_move//10 + 0.5))
+                    # Select a move position.
+                    x, y = int(buffer + tile_size*(r_move%10 + 0.5)), int(buffer + tile_size*(r_move//10 + 0.5))
                     mouse.position = (x, y+5)
                     mouse.click(Button.left, 1)
 
                 elif piece != None and move != None:
-                    # make shoot
-                    x, y = int(buffer+ tile_size*(r_shoot%10 + 0.5)), int(buffer+ tile_size*(r_shoot//10 + 0.5))
+                    # Select a shoot location.
+                    x, y = int(buffer + tile_size*(r_shoot%10 + 0.5)), int(buffer + tile_size*(r_shoot//10 + 0.5))
                     mouse.position = (x, y)
                     mouse.click(Button.left, 1)
 
-            if event.type == pygame.QUIT: # If window close button, end game
-                run_game = False
-
+            # Not a random game, request user input.
             else:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos() # find index of pressed tile
@@ -154,6 +196,9 @@ def main(testgame=0):
                             move            = None
                             move_locations  = []
                             shoot_locations = []
+
+
+                ### **CHANGE TO UPDATE BOARD**
 
                 # Draw board
                 draw_board(game_display, buffer, tile_size, g, piece, move, move_locations, shoot_locations)
