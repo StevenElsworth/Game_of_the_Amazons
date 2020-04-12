@@ -45,10 +45,8 @@ This class stores all information about the current board. The main attribute is
 
 3. Warrior
 
-This class represents the players pieces. Each piece has alliance '1' or '2' indicating which player it belongs to. This class also has two extremely important functions:
-  * find_moves: Given the board, returns all available locations to which the piece can move. It does this by looking exhaustively in each of the 8 directions.
-  * find_shoots: Given a specific move location, returns all the possible shoot locations.
-    NB. There is quite a bit of overlap in the functions which could probably be simplified.
+This class represents the players' pieces. Each piece has alliance '1' or '2' indicating which player it belongs to. This class has an extremely important function:
+  * find_moves or shots: Given the board, current warrior position and old warrior poistion, returns all available locations to which the piece can move or shoot. It does this by looking exhaustively in each of the 8 directions.
 
 
 4. Flame
