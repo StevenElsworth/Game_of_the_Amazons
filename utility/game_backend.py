@@ -9,6 +9,7 @@ class Game:
     def __init__(self, testgame=False):
         self.board = Board()
         self.turn = '1'
+        self.turncount = 1
         self.testgame = testgame
 
     def make_play(self, piece, move, shoot):
@@ -48,6 +49,9 @@ class Game:
         else:
             self.turn = '1'
 
+        # Add one to the turn counter.
+        self.turncount += 1
+
     def find_available_plays(self):
         """
         Find all available plays for a player.
@@ -61,9 +65,9 @@ class Game:
         available_plays = {} # dictionary for efficiency
         for i, tile in enumerate(self.board.game_tiles): # search entire board
             if tile.to_string() == self.turn: # found a warrior belonging to current player
-                moves = tile.find_moves(self.board) # find all available moves
+                moves = tile.find_moves_or_shots(self.board, tile.position, tile.position) # find all available moves
                 for move in moves:
-                    shoot_locations = tile.find_shoots(self.board, move) # find all shoot locations
+                    shoot_locations = tile.find_moves_or_shots(self.board, move, tile.position, shooting=True) # find all available shots
                     if shoot_locations != []:
                         if i not in available_plays:
                             available_plays[i] = {} # create nested dictionary if doesn't already exist
@@ -112,9 +116,9 @@ class Game:
             available_plays = self.find_available_plays()
             if available_plays == {}: # Q: Is this a sufficient condition for the game to end?
                 if self.turn == '1':
-                    print('Player 2 has won the game!')
+                    print('Player 2 has won the game in ' + str(self.turncount) + ' turns!')
                 else:
-                    print('Player 1 has won the game!')
+                    print('Player 1 has won the game in ' + str(self.turncount) + ' turns!')
                 break
 
             while True:
@@ -174,14 +178,16 @@ class Board:
             if (tiles+1)%10 == 0:
                 print('|')
 
+        print('\n')
+
 
 class Warrior:
     """
     TODO: Description of Warrior class.
     """
     def __init__(self, alliance, position):
-        self.alliance       = alliance
-        self.position       = position
+        self.alliance = alliance
+        self.position = position
 
     def to_string(self):
         """
@@ -189,17 +195,32 @@ class Warrior:
         """
         return "1" if self.alliance==1 else "2"
 
-    def find_moves(self, board):
+    def find_moves_or_shots(self, board, current_pos, old_pos, shooting=False):
         """
-        Find all possible move locations. ----- TODO?: Is there a faster way to do this?
+        Find all possible positions to which the piece can move or shoot.
+
+        Parameters:
+        -----------
+        board : class
+            Current board.
+        current_pos : int
+            Current position of Warrior.
+        old_pos : int
+            Position of warrior before moving (equal to current position if not shooting).
+        shooting : Boolean
+            Indicate whether shooting or moving.
+
+        Returns:
+        -----------
+        targets : list of potential move or shoot positions.
         """
-        # Initialise storage for possible moves.
-        moves = []
+        # Initialise storage for possible targets.
+        targets = []
 
         # Explore each of the 8 directions in turn.
         for step in board.possible_steps:
-            # Position of warrior object on board.
-            pos = self.position
+            # Current position of the warrior.
+            pos = current_pos
 
             # Convert integer representation of current position to Cartesian co-ordinates.
             x = pos%10
@@ -210,46 +231,23 @@ class Warrior:
                 x += step[0]
                 y += step[1]
                 if (0 <= x <= 9) and (0 <= y <= 9):
-                    # Convert Cartesian co-ordinates of new positition to integer representation.
-                    new_pos = x + 10*y
+                    # Convert Cartesian co-ordinates of target positition to integer representation.
+                    target = x + 10*y
 
-                    # If new position is unoccupied, add it to possible move locations.
-                    if board.game_tiles[new_pos].to_string() == '-':
-                        moves.append(new_pos)
+                    # If new position is unoccupied, add it to possible target locations.
+                    if (board.game_tiles[target].to_string() == '-') or (shooting and target == old_pos):
+                        targets.append(target)
                     else:
                         break
                 else:
                     break
-        return moves
-
-    def find_shoots(self, board, move):
-        """
-        Find all possible shoot locations from the position move.
-        """
-        old_position = self.position
-        moves = []
-        for step in board.possible_steps:
-            pos = move
-            # Convert to cartesian
-            x = pos%10
-            y = pos//10
-            while (0 <= x <= 9) and (0 <= y <= 9):
-                x += step[0]
-                y += step[1]
-                if (0 <= x <= 9) and (0 <= y <= 9):
-                    pos2 = x + 10*y
-                    if board.game_tiles[pos2].to_string() == '-' or pos2 == old_position:
-                        moves.append(pos2)
-                    else:
-                        break
-                else:
-                    break
-        return moves
+        return targets
 
 
 class Flame:
     """
-    TODO: Description of Flame class.
+    Flame object which occupies a single board position. Has no allegiance to
+    either team and is represented by the string "0".
     """
     def __init__(self, alliance=None, position=None):
         self.alliance = alliance
@@ -261,11 +259,12 @@ class Flame:
 
 class Null:
     """
-    TODO: Description of Null class.
+    Null object which represents an empty board position. Has no allegiance to
+    either team and is represented by the string "-".
     """
     def __init__(self, alliance=None, position=None):
         self.alliance = alliance
         self.position = position
 
     def to_string(self):
-        return "-"
+        return '-'
