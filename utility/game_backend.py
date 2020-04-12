@@ -4,13 +4,16 @@ import random
 
 class Game:
     """
-    TODO: Description of Game class.
+    Controls all attributes of the game, with functions to find all available
+    plays, request a play command from the user, check an input play is legal
+    and enact a legal play. Initialised with a board instance, turn counter and
+    turn indicator.
     """
     def __init__(self, testgame=False):
-        self.board = Board()
-        self.turn = '1'
-        self.turncount = 1
-        self.testgame = testgame
+        self.board = Board()        # initialise a game board
+        self.turn = '1'             # set turn indicator to (player) 1
+        self.turncount = 1          # initialise turn counter to 1
+        self.testgame = testgame    # indicate whether user game or random/test game
 
     def make_play(self, piece, move, shoot):
         """
@@ -30,18 +33,14 @@ class Game:
         ------
         This function assumes the move and shoot actions are legal.
         """
-        # --------
-        #   MOVE
-        # --------
+        # Move.
         moving_piece = self.board.game_tiles[piece]     # get Warrior object
         moving_piece.position = move                    # assign (new) position attribute to index of Warrior
         self.board.game_tiles[move] = moving_piece      # assign Warrior object on game board to proposed location using index
         self.board.game_tiles[piece] = Null(None, None) # generate empty tile for where Warrior was before moving
 
-        # --------
-        #  SHOOT
-        # --------
-        self.board.game_tiles[shoot] = Flame(0, shoot) # assign Flame object to location which has been shot
+        # Shoot.
+        self.board.game_tiles[shoot] = Flame(0, shoot)  # assign Flame object to location which has been shot
 
         # Change turn of player.
         if self.turn == '1':
@@ -49,7 +48,7 @@ class Game:
         else:
             self.turn = '1'
 
-        # Add one to the turn counter.
+        # Increment the turn counter.
         self.turncount += 1
 
     def find_available_plays(self):
@@ -62,16 +61,22 @@ class Game:
             Nested dictionary of the form available_plays[warrior_location][move_location] = [shoot_locations],
             containing all available moves and corresponding shoot locations for each piece.
         """
-        available_plays = {} # dictionary for efficiency
-        for i, tile in enumerate(self.board.game_tiles): # search entire board
-            if tile.to_string() == self.turn: # found a warrior belonging to current player
-                moves = tile.find_moves_or_shots(self.board, tile.position, tile.position) # find all available moves
+        # Initialise dictionary to store available plays.
+        available_plays = {}
+
+        # Search through board tiles.
+        for i, tile in enumerate(self.board.game_tiles):
+            # Found a warrior belonging to current player.
+            if tile.to_string() == self.turn:
+                # Find all available moves.
+                moves = tile.find_moves_or_shots(self.board, tile.position, tile.position)
+                # Find all available shots for each possible move.
                 for move in moves:
-                    shoot_locations = tile.find_moves_or_shots(self.board, move, tile.position, shooting=True) # find all available shots
+                    shoot_locations = tile.find_moves_or_shots(self.board, move, tile.position, shooting=True)
                     if shoot_locations != []:
                         if i not in available_plays:
-                            available_plays[i] = {} # create nested dictionary if doesn't already exist
-                        available_plays[i][move] = shoot_locations # store possible move locations and corresponding possible shoot locations for piece i
+                            available_plays[i] = {}                 # create nested dictionary if doesn't already exist
+                        available_plays[i][move] = shoot_locations  # store possible move locations and corresponding possible shoot locations for piece i
         return available_plays
 
     def check_play_is_legal(self, available_plays, piece, move, shoot):
@@ -106,15 +111,16 @@ class Game:
     def play(self):
         """
         Requests user to provide piece, move and shoot values. If the combination
-        is not a legal move, ask again. Otherwise the play is completed.
+        is not a legal move, ask again. Otherwise the play is completed. The
+        game is ended when no available plays remain.
         """
         while True:
             # Print the board to screen.
             self.board.print_board()
 
-            # Check if the game has ended (ie, no available plays).
+            # If the game has ended (ie, no available plays), output message to screen.
             available_plays = self.find_available_plays()
-            if available_plays == {}: # Q: Is this a sufficient condition for the game to end?
+            if available_plays == {}:
                 if self.turn == '1':
                     print('Player 2 has won the game in ' + str(self.turncount) + ' turns!')
                 else:
@@ -122,7 +128,7 @@ class Game:
                 break
 
             while True:
-                # If game is being played by user, request user input.
+                # If game is being played by user, request user input a play.
                 if not self.testgame:
                     piece = int(input('Player ' + self.turn + ', select a piece:'))
                     move  = int(input('Now choose a move location:'))
@@ -132,6 +138,7 @@ class Game:
                     else:
                         print('Invalid play selection, please choose a different piece, move & shoot combination.')
                         self.board.print_board()
+
                 # If test game, choose from available plays at random.
                 else:
                     piece = random.choice(list(available_plays))
@@ -145,9 +152,11 @@ class Game:
 
 class Board:
     """
-    TODO: Description of Board class.
+    Stores all information about the current board. The tiles attribute
+    indicates which positions are empty (Null class), which are occupied by
+    warriors (Warrior class) and which are on fire (Flame class).
     """
-    def __init__(self, ):
+    def __init__(self):
         # Possible directions of travel for pieces and arrows.
         self.possible_steps = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
 
@@ -178,12 +187,14 @@ class Board:
             if (tiles+1)%10 == 0:
                 print('|')
 
-        print('\n')
+        print('\n') # create space between boards in test games
 
 
 class Warrior:
     """
-    TODO: Description of Warrior class.
+    Represents the players' pieces, each piece has alliance '1' or '2' to
+    indicate which player it belongs to. Contains function to find all available
+    moves and shots for that piece.
     """
     def __init__(self, alliance, position):
         self.alliance = alliance
@@ -193,7 +204,7 @@ class Warrior:
         """
         Return a string indicating to which player the warrior belongs.
         """
-        return "1" if self.alliance==1 else "2"
+        return '1' if self.alliance==1 else '2'
 
     def find_moves_or_shots(self, board, current_pos, old_pos, shooting=False):
         """
