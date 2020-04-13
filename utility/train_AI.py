@@ -233,9 +233,7 @@ def run(iteration=0):
 
 
 
-
-
-
-
+# Useful Links:
+# -------------
 # https://towardsdatascience.com/from-scratch-implementation-of-alphazero-for-connect4-f73d4554002a
 # https://github.com/plkmo/AlphaZero_Connect4
