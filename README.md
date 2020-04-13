@@ -68,9 +68,9 @@ py.test
 ## To Do
 - Add AI to play against user. Train using AlphaZero reinforcement learning (see below)
 - Generalise the size of the board and the number of warriors
-- Improve the efficiency of the GUI: e.g., currently the whole board is drawn each turn
-- Improve the appearance of the GUI: e.g., better player icons, better fire icon, grey-out warriors when they have zero available moves, more information in text
-- Improve the features of the GUI: e.g., add undo button
+- Improve the efficiency of the GUI: e.g., currently the whole board is drawn each turn, add 'update board' function
+- Improve the appearance of the GUI: e.g., better player icons, better fire icon, grey-out warriors when they have zero available moves, more information in caption text, pop-up message at the end of the game
+- Improve the features of the GUI: e.g., add undo button (store previous move in cache)
 - Autocomplete function to end game?
 
 
