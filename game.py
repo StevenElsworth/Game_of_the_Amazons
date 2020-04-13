@@ -126,21 +126,21 @@ def draw_board(game_display, buffer, tile_size, game, piece, move, move_location
 
 def main(testgame=True):
     """
-    FUNCTION DESCRIPTION.
+    Initialises and runs the game.
 
     Parameters:
     -----------
-
-    Returns:
-    --------
+    testgame : boolean
+        Indicates whether the game is being played by the user or at random.
     """
-    buffer    = 60  # size of border around the game board
+    buffer    = 50  # size of border around the game board
     tile_size = 60  # size (width & height) of game tiles
 
-    screen_x = 2*buffer+10*tile_size # width of screen
-    screen_y = 2*buffer+10*tile_size # height of screen
+    screen_x = 2*buffer+10*tile_size    # width of screen
+    screen_y = 2*buffer+10*tile_size    # height of screen
 
-    pause_time = 1
+    tbar_height = 45    # height of the taskbar TODO: extract the exact value
+    pause_time = 1.5    # wait time between turns in random game through GUI
 
     # Place game screen in the top left corner of the screen.
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
@@ -188,7 +188,7 @@ def main(testgame=True):
         available_plays = g.find_available_plays()
 
         # If no available plays, end the game and update caption.
-        if available_plays == {} or g.turncount == 10: # <---- TODO: REMOVE early end condition used for testing.
+        if available_plays == {} or g.turncount == 150: # <---- TODO: REMOVE early end condition used for testing.
             if g.turn == '1':
                 pygame.display.set_caption('Game of the Amazons - Green has won the game in ' + str(g.turncount-1) + ' turns! Click anywhere to close the game.')
             else:
@@ -208,7 +208,7 @@ def main(testgame=True):
 
             # End game when user clicks.
             if testgame:
-                time.sleep(5*pause_time)
+                time.sleep(10)
                 run_game = False
                 break
             elif pygame.event.get(pygame.MOUSEBUTTONDOWN):
@@ -216,8 +216,8 @@ def main(testgame=True):
                 break
 
         # If a test game, complete a random play.
-        # Note requires three passes through the while loop per play due to
-        # the board being drawn at the end of each pass.
+        # Note requires three passes through the while loop per play due to the
+        # board being drawn at the end of each pass.
         if testgame:
             if piece == None:
                 # Select random play.
@@ -226,27 +226,28 @@ def main(testgame=True):
                 r_shoot = random.choice(available_plays[r_piece][r_move])
 
                 # Select a piece.
-                x, y = buffer + tile_size*((r_piece%10) + 0.5), buffer + tile_size*((r_piece//10) + 1.25)
+                x, y = buffer + tile_size*(r_piece%10 + 0.5), buffer + tbar_height + tile_size*(r_piece//10 + 0.5)
                 mouse.position = (x, y)
                 mouse.click(Button.left, 1)
-
-                time.sleep(pause_time)
 
             elif piece != None and move == None:
                 # Select a move position.
-                x, y = buffer + tile_size*((r_move%10) + 0.5), buffer + tile_size*((r_move//10) + 1.25)
+                x, y = buffer + tile_size*(r_move%10 + 0.5), buffer + tbar_height + tile_size*(r_move//10 + 0.5)
                 mouse.position = (x, y)
                 mouse.click(Button.left, 1)
-
-                time.sleep(pause_time)
 
             elif piece != None and move != None:
                 # Select a shoot location.
-                x, y = buffer + tile_size*((r_shoot%10) + 0.5), buffer + tile_size*((r_shoot//10) + 1.25)
+                x, y = buffer + tile_size*(r_shoot%10 + 0.5), buffer + tbar_height + tile_size*(r_shoot//10 + 0.5)
                 mouse.position = (x, y)
                 mouse.click(Button.left, 1)
 
-                time.sleep(pause_time)
+            # TODO: Change to *UPDATE* board.
+            # Draw board
+            draw_board(game_display, buffer, tile_size, g, piece, move, move_locations, shoot_locations)
+            pygame.display.flip()
+
+            time.sleep(pause_time)
 
         # Did user press a key?
         for event in pygame.event.get():
@@ -298,7 +299,7 @@ def main(testgame=True):
                         shoot_locations = []
 
 
-                # TODO: Change to update board.
+                # TODO: Change to *UPDATE* board.
                 # Draw board
                 draw_board(game_display, buffer, tile_size, g, piece, move, move_locations, shoot_locations)
                 pygame.display.flip()
