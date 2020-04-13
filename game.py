@@ -134,11 +134,13 @@ def main(testgame=True):
     Returns:
     --------
     """
-    buffer    = 50  # size of border around the game board
+    buffer    = 60  # size of border around the game board
     tile_size = 60  # size (width & height) of game tiles
 
     screen_x = 2*buffer+10*tile_size # width of screen
     screen_y = 2*buffer+10*tile_size # height of screen
+
+    pause_time = 1
 
     # Place game screen in the top left corner of the screen.
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
@@ -177,7 +179,7 @@ def main(testgame=True):
     # If random/test game (no user).
     if testgame:
         mouse = Controller()
-        time.sleep(2)
+        time.sleep(pause_time)
 
     # Game running.
     while run_game:
@@ -186,7 +188,7 @@ def main(testgame=True):
         available_plays = g.find_available_plays()
 
         # If no available plays, end the game and update caption.
-        if available_plays == {} or g.turncount == 3: # <---- TODO: REMOVE
+        if available_plays == {} or g.turncount == 10: # <---- TODO: REMOVE early end condition used for testing.
             if g.turn == '1':
                 pygame.display.set_caption('Game of the Amazons - Green has won the game in ' + str(g.turncount-1) + ' turns! Click anywhere to close the game.')
             else:
@@ -205,10 +207,46 @@ def main(testgame=True):
             pygame.display.flip()
 
             # End game when user clicks.
-            if pygame.event.get(pygame.MOUSEBUTTONDOWN):
+            if testgame:
+                time.sleep(5*pause_time)
+                run_game = False
+                break
+            elif pygame.event.get(pygame.MOUSEBUTTONDOWN):
                 run_game = False
                 break
 
+        # If a test game, complete a random play.
+        # Note requires three passes through the while loop per play due to
+        # the board being drawn at the end of each pass.
+        if testgame:
+            if piece == None:
+                # Select random play.
+                r_piece = random.choice(list(available_plays))
+                r_move  = random.choice(list(available_plays[r_piece]))
+                r_shoot = random.choice(available_plays[r_piece][r_move])
+
+                # Select a piece.
+                x, y = buffer + tile_size*((r_piece%10) + 0.5), buffer + tile_size*((r_piece//10) + 1.25)
+                mouse.position = (x, y)
+                mouse.click(Button.left, 1)
+
+                time.sleep(pause_time)
+
+            elif piece != None and move == None:
+                # Select a move position.
+                x, y = buffer + tile_size*((r_move%10) + 0.5), buffer + tile_size*((r_move//10) + 1.25)
+                mouse.position = (x, y)
+                mouse.click(Button.left, 1)
+
+                time.sleep(pause_time)
+
+            elif piece != None and move != None:
+                # Select a shoot location.
+                x, y = buffer + tile_size*((r_shoot%10) + 0.5), buffer + tile_size*((r_shoot//10) + 1.25)
+                mouse.position = (x, y)
+                mouse.click(Button.left, 1)
+
+                time.sleep(pause_time)
 
         # Did user press a key?
         for event in pygame.event.get():
@@ -216,32 +254,6 @@ def main(testgame=True):
             # If window close button is pressed, end the game.
             if event.type == pygame.QUIT:
                 run_game = False
-
-            # If a test game, complete a random play.
-            # Note requires three passes through the while loop per play due to board being drawn at end.
-            if testgame:
-                if piece == None:
-                    # Select random play.
-                    r_piece = random.choice(list(available_plays))
-                    r_move  = random.choice(list(available_plays[r_piece]))
-                    r_shoot = random.choice(available_plays[r_piece][r_move])
-
-                    # Select a piece.
-                    x, y = int(buffer + tile_size*(r_piece%10 + 0.5)), int(buffer + tile_size*(r_piece//10 + 0.5))
-                    mouse.position = (x, y)
-                    mouse.click(Button.left, 1)
-
-                elif piece != None and move == None:
-                    # Select a move position.
-                    x, y = int(buffer + tile_size*(r_move%10 + 0.5)), int(buffer + tile_size*(r_move//10 + 0.5))
-                    mouse.position = (x, y)
-                    mouse.click(Button.left, 1)
-
-                elif piece != None and move != None:
-                    # Select a shoot location.
-                    x, y = int(buffer + tile_size*(r_shoot%10 + 0.5)), int(buffer + tile_size*(r_shoot//10 + 0.5))
-                    mouse.position = (x, y)  ## TODO: should this be (x,y+5)?
-                    mouse.click(Button.left, 1)
 
             # Not a random game, therefore request user input.
             #else:
