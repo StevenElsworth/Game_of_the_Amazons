@@ -140,7 +140,7 @@ def main(testgame=True):
     screen_y = 2*buffer+10*tile_size    # height of screen
 
     tbar_height = 45    # height of the taskbar TODO: extract the exact value
-    pause_time = 1.5    # wait time between turns in random game through GUI
+    pause_time = 0.1    # wait time between turns in random game through GUI
 
     # Place game screen in the top left corner of the screen.
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
