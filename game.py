@@ -6,7 +6,7 @@ import random
 import os
 
 
-def mouse_to_index(mx, my, buffer, tile_size):
+def mouse_to_index(mx, my, buffer, dim, tile_size):
     """
     Converts a mouse click location into a board/tile index.
 
@@ -18,6 +18,8 @@ def mouse_to_index(mx, my, buffer, tile_size):
         y co-ordinate of the mouse click location.
     buffer : float
         Width of the buffer surrounding the game board.
+    dim : integer
+        Width (and height) of the board in tiles.
     tile_size : float
         Width/height of a single tile.
 
@@ -27,7 +29,7 @@ def mouse_to_index(mx, my, buffer, tile_size):
     """
     s_row = (my - buffer)//tile_size # row of the board containing the mouse click location
     s_col = (mx - buffer)//tile_size # column of the board containing the mouse click location
-    return s_col + s_row*10
+    return s_col + s_row*dim
 
 
 def draw_board(game_display, buffer, tile_size, game, piece, move, move_locations, shoot_locations):
@@ -64,30 +66,33 @@ def draw_board(game_display, buffer, tile_size, game, piece, move, move_location
     RED   = (255,0,0)
     BLACK = (0,0,0)
 
+    # Board width (and height).
+    dim = game.board.dim
+
     # Draw the game board: white background.
     game_display.fill(WHITE)
 
     # Draw the game board: fill every other diagonal in grey.
-    for x in range(0, 10):
+    for x in range(0, dim):
         if x%2 == 1:
-            for y in range(0, 10, 2):
+            for y in range(0, dim, 2):
                 pygame.draw.rect(game_display, GREY, (buffer+x*tile_size, buffer+y*tile_size, tile_size, tile_size))
         else:
-            for y in range(1, 10, 2):
+            for y in range(1, dim, 2):
                 pygame.draw.rect(game_display, GREY, (buffer+x*tile_size, buffer+y*tile_size, tile_size, tile_size))
 
     # Draw the game board: add grey border.
-    pygame.draw.line(game_display, GREY, (buffer,buffer),                           (buffer,buffer+10*tile_size), 4)                # bottom left  -> top left
-    pygame.draw.line(game_display, GREY, (buffer,buffer+10*tile_size),              (buffer+10*tile_size,buffer+10*tile_size), 4)   # top left     -> top right
-    pygame.draw.line(game_display, GREY, (buffer+10*tile_size,buffer+10*tile_size), (buffer+10*tile_size,buffer), 4)                # top right    -> bottom right
-    pygame.draw.line(game_display, GREY, (buffer+10*tile_size,buffer),              (buffer,buffer), 4)                             # bottom right -> bottom left
+    pygame.draw.line(game_display, GREY, (buffer,buffer),                             (buffer,buffer+dim*tile_size),               4)  # bottom left  -> top left
+    pygame.draw.line(game_display, GREY, (buffer,buffer+dim*tile_size),               (buffer+dim*tile_size,buffer+dim*tile_size), 4)  # top left     -> top right
+    pygame.draw.line(game_display, GREY, (buffer+dim*tile_size,buffer+dim*tile_size), (buffer+dim*tile_size,buffer),               4)  # top right    -> bottom right
+    pygame.draw.line(game_display, GREY, (buffer+dim*tile_size,buffer),               (buffer,buffer),                             4)  # bottom right -> bottom left
 
     # Add pieces.
     piece_radius = int(0.4*tile_size)
-    for col in range(10):
-        for row in range(10):
+    for col in range(dim):
+        for row in range(dim):
             # Position index of (row,column) pair.
-            index = row + col*10
+            index = row + col*dim
             # Top left hand corner of the tile whose position is index.
             top_left = (int(buffer+(tile_size*(int(row)))), int(buffer+(tile_size*(int(col)))))
 
@@ -110,7 +115,7 @@ def draw_board(game_display, buffer, tile_size, game, piece, move, move_location
     if not move_locations == None:
         for move in move_locations:
             # Co-ordinates of the centre of the tile.
-            location = (int(buffer+ tile_size*(move%10 + 0.5)), int(buffer+ tile_size*(move//10 + 0.5)))
+            location = (int(buffer+ tile_size*(move%dim + 0.5)), int(buffer+ tile_size*(move//dim + 0.5)))
             # Draw black circles to indicate possible move locations.
             pygame.draw.circle(game_display, BLACK, location, 5, 5)
 
@@ -118,7 +123,7 @@ def draw_board(game_display, buffer, tile_size, game, piece, move, move_location
     if not shoot_locations == None:
         for s in shoot_locations:
             # Co-ordinates of the centre of the tile.
-            location = (int(buffer+ tile_size*(s%10 + 0.5)), int(buffer+ tile_size*(s//10 + 0.5)))
+            location = (int(buffer+ tile_size*(s%dim + 0.5)), int(buffer+ tile_size*(s//dim + 0.5)))
             # Draw red circles to indicate possible shoot locations.
             pygame.draw.circle(game_display, RED, location, 5, 5)
     return
@@ -136,19 +141,26 @@ def main(testgame=True):
     buffer    = 50  # size of border around the game board
     tile_size = 60  # size (width & height) of game tiles
 
-    screen_x = 2*buffer+10*tile_size    # width of screen
-    screen_y = 2*buffer+10*tile_size    # height of screen
-
     tbar_height = 45    # height of the taskbar TODO: extract the exact value
+
     pause_time = 0.1    # wait time between turns in random game through GUI
 
     # Place game screen in the top left corner of the screen.
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
 
-    # Initialize the game.
+    # Initialise game using class Game from game_backend.py.
+    g = Game()
+
+    # Board width (and height).
+    dim = g.board.dim
+
+    # Initialize the game in pygame.
     pygame.init()
 
     # Set the size of the screen which displays the game board and buffer.
+    screen_x = 2*buffer+dim*tile_size    # width of screen
+    screen_y = 2*buffer+dim*tile_size    # height of screen
+
     game_display = pygame.display.set_mode((screen_x, screen_y))
 
     # Font for end of game message.
@@ -156,9 +168,6 @@ def main(testgame=True):
 
     # Caption display at top of screen (game name).
     pygame.display.set_caption('Game of the Amazons')
-
-    # Initialise game using class Game from game_backend.py.
-    g = Game()
 
     # Boolean flag for game (see while loop below).
     run_game = True
@@ -188,7 +197,7 @@ def main(testgame=True):
         available_plays = g.find_available_plays()
 
         # If no available plays, end the game and update caption.
-        if available_plays == {} or g.turncount == 150: # <---- TODO: REMOVE early end condition used for testing.
+        if available_plays == {} or g.turncount == 9999: # <-- Early end condition used for testing.
             if g.turn == '1':
                 pygame.display.set_caption('Game of the Amazons - Green has won the game in ' + str(g.turncount-1) + ' turns! Click anywhere to close the game.')
             else:
@@ -226,20 +235,20 @@ def main(testgame=True):
                 r_shoot = random.choice(available_plays[r_piece][r_move])
 
                 # Select a piece.
-                x, y = buffer + tile_size*(r_piece%10 + 0.5), buffer + tbar_height + tile_size*(r_piece//10 + 0.5)
-                mouse.position = (x, y)
+                x, y = buffer + tile_size*(r_piece%dim + 0.5), buffer + tile_size*(r_piece//dim + 0.5)
+                mouse.position = (x, y + tbar_height)
                 mouse.click(Button.left, 1)
 
             elif piece != None and move == None:
                 # Select a move position.
-                x, y = buffer + tile_size*(r_move%10 + 0.5), buffer + tbar_height + tile_size*(r_move//10 + 0.5)
-                mouse.position = (x, y)
+                x, y = buffer + tile_size*(r_move%dim + 0.5), buffer + tile_size*(r_move//dim + 0.5)
+                mouse.position = (x, y + tbar_height)
                 mouse.click(Button.left, 1)
 
             elif piece != None and move != None:
                 # Select a shoot location.
-                x, y = buffer + tile_size*(r_shoot%10 + 0.5), buffer + tbar_height + tile_size*(r_shoot//10 + 0.5)
-                mouse.position = (x, y)
+                x, y = buffer + tile_size*(r_shoot%dim + 0.5), buffer + tile_size*(r_shoot//dim + 0.5)
+                mouse.position = (x, y + tbar_height)
                 mouse.click(Button.left, 1)
 
             # TODO: Change to *UPDATE* board.
@@ -263,7 +272,7 @@ def main(testgame=True):
                 # Mouse cursor position.
                 mx, my = pygame.mouse.get_pos()
                 # Find corresponding tile index.
-                index = mouse_to_index(mx, my, buffer, tile_size)
+                index = mouse_to_index(mx, my, buffer, dim, tile_size)
 
                 # Warrior piece of current team selected using the mouse.
                 if g.board.game_tiles[index].to_string() == g.turn and move == None:
