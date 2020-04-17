@@ -8,11 +8,11 @@ class Game:
     and enact a legal play. Initialised with a board instance, turn counter and
     turn indicator.
     """
-    def __init__(self, testgame=False):
-        self.board = Board()        # initialise a game board
-        self.turn = '1'             # set turn indicator to (player) 1
-        self.turncount = 1          # initialise turn counter to 1
-        self.testgame = testgame    # indicate whether user game or random/test game
+    def __init__(self, testgame=False, board_width=10):
+        self.board = Board(width=board_width)   # initialise a game board
+        self.turn = '1'                         # set turn indicator to (player) 1
+        self.turncount = 1                      # initialise turn counter to 1
+        self.testgame = testgame                # indicate whether user game or random/test game
 
     def make_play(self, piece, move, shoot):
         """
@@ -121,9 +121,9 @@ class Game:
             available_plays = self.find_available_plays()
             if available_plays == {}:
                 if self.turn == '1':
-                    print('Player 2 has won the game in ' + str(self.turncount) + ' turns!')
+                    print('Player 2 has won the game in ' + str(self.turncount-1) + ' turns!')
                 else:
-                    print('Player 1 has won the game in ' + str(self.turncount) + ' turns!')
+                    print('Player 1 has won the game in ' + str(self.turncount-1) + ' turns!')
                 break
 
             while True:
@@ -155,35 +155,72 @@ class Board:
     indicates which positions are empty (Null class), which are occupied by
     warriors (Warrior class) and which are on fire (Flame class).
     """
-    def __init__(self):
+    def __init__(self, width=4):
+        # Width of the (square) board in tiles.
+        self.dim = width
+
         # Possible directions of travel for pieces and arrows.
         self.possible_steps = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
 
         # Initialise the board with nulls.
         self.game_tiles = []
-        for tile in range(100):
+        for tile in range(self.dim**2):
             self.game_tiles.append(Null(None, None))
 
-        # Add Warriors of tribe/player 1.
-        self.game_tiles[3]  = Warrior(1, 3)
-        self.game_tiles[6]  = Warrior(1, 6)
-        self.game_tiles[30] = Warrior(1, 30)
-        self.game_tiles[39] = Warrior(1, 39)
 
-        # Add Warriors or tribe/player 2.
-        self.game_tiles[60] = Warrior(2, 60)
-        self.game_tiles[69] = Warrior(2, 69)
-        self.game_tiles[93] = Warrior(2, 93)
-        self.game_tiles[96] = Warrior(2, 96)
+        # Add in Warrior pieces using preset starting positions.
+        # 10x10 board.
+        if(self.dim==10):
+            # Add Warriors of tribe/player 1.
+            self.game_tiles[3]  = Warrior(1, 3)
+            self.game_tiles[6]  = Warrior(1, 6)
+            self.game_tiles[30] = Warrior(1, 30)
+            self.game_tiles[39] = Warrior(1, 39)
+
+            # Add Warriors or tribe/player 2.
+            self.game_tiles[60] = Warrior(2, 60)
+            self.game_tiles[69] = Warrior(2, 69)
+            self.game_tiles[93] = Warrior(2, 93)
+            self.game_tiles[96] = Warrior(2, 96)
+
+        # 5x5 board.
+        elif(self.dim==5):
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[0]  = Warrior(1, 0)
+            self.game_tiles[2]  = Warrior(1, 2)
+            self.game_tiles[4]  = Warrior(1, 4)
+
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[20]  = Warrior(2, 20)
+            self.game_tiles[22]  = Warrior(2, 22)
+            self.game_tiles[24]  = Warrior(2, 24)
+
+        # 4x4 board.
+        elif(self.dim==4):
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[0]  = Warrior(1, 0)
+            self.game_tiles[3]  = Warrior(1, 3)
+
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[12]  = Warrior(2, 12)
+            self.game_tiles[15]  = Warrior(2, 15)
+
+        # 3x3 board.
+        elif(self.dim==3):
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[0]  = Warrior(1, 0)
+
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[8]  = Warrior(2, 8)
 
 
     def print_board(self):
         """
         Display the game board to screen.
         """
-        for tiles in range(100):
+        for tiles in range(self.dim**2):
             print('|', end=self.game_tiles[tiles].to_string())
-            if (tiles+1)%10 == 0:
+            if (tiles+1)%self.dim == 0:
                 print('|')
 
         print('\n') # create space between boards in test games
@@ -233,16 +270,16 @@ class Warrior:
             pos = current_pos
 
             # Convert integer representation of current position to Cartesian co-ordinates.
-            x = pos%10
-            y = pos//10
+            x = pos%board.dim
+            y = pos//board.dim
 
             # Explore in current step direction to the edge of the board.
-            while (0 <= x <= 9) and (0 <= y <= 9):
+            while (0 <= x <= board.dim-1) and (0 <= y <= board.dim-1):
                 x += step[0]
                 y += step[1]
-                if (0 <= x <= 9) and (0 <= y <= 9):
+                if (0 <= x <= board.dim-1) and (0 <= y <= board.dim-1):
                     # Convert Cartesian co-ordinates of target positition to integer representation.
-                    target = x + 10*y
+                    target = x + board.dim*y
 
                     # If new position is unoccupied, add it to possible target locations.
                     if (board.game_tiles[target].to_string() == '-') or (shooting and target == old_pos):
