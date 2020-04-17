@@ -8,11 +8,11 @@ class Game:
     and enact a legal play. Initialised with a board instance, turn counter and
     turn indicator.
     """
-    def __init__(self, testgame=False):
-        self.board = Board()        # initialise a game board
-        self.turn = '1'             # set turn indicator to (player) 1
-        self.turncount = 1          # initialise turn counter to 1
-        self.testgame = testgame    # indicate whether user game or random/test game
+    def __init__(self, testgame=False, board_width=4):
+        self.board = Board(width=board_width)   # initialise a game board
+        self.turn = '1'                         # set turn indicator to (player) 1
+        self.turncount = 1                      # initialise turn counter to 1
+        self.testgame = testgame                # indicate whether user game or random/test game
 
     def make_play(self, piece, move, shoot):
         """
@@ -159,15 +159,12 @@ class Board:
         # Width of the (square) board in tiles.
         self.dim = width
 
-        # Number of tiles on the board.
-        self.numtiles = width**2
-
         # Possible directions of travel for pieces and arrows.
         self.possible_steps = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
 
         # Initialise the board with nulls.
         self.game_tiles = []
-        for tile in range(self.numtiles):
+        for tile in range(self.dim**2):
             self.game_tiles.append(Null(None, None))
 
         if(self.dim==10):
@@ -202,7 +199,7 @@ class Board:
         """
         Display the game board to screen.
         """
-        for tiles in range(self.numtiles):
+        for tiles in range(self.dim**2):
             print('|', end=self.game_tiles[tiles].to_string())
             if (tiles+1)%self.dim == 0:
                 print('|')
