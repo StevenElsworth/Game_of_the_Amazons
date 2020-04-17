@@ -8,7 +8,7 @@ class Game:
     and enact a legal play. Initialised with a board instance, turn counter and
     turn indicator.
     """
-    def __init__(self, testgame=False, board_width=4):
+    def __init__(self, testgame=False, board_width=10):
         self.board = Board(width=board_width)   # initialise a game board
         self.turn = '1'                         # set turn indicator to (player) 1
         self.turncount = 1                      # initialise turn counter to 1
@@ -167,6 +167,9 @@ class Board:
         for tile in range(self.dim**2):
             self.game_tiles.append(Null(None, None))
 
+
+        # Add in Warrior pieces using preset starting positions.
+        # 10x10 board.
         if(self.dim==10):
             # Add Warriors of tribe/player 1.
             self.game_tiles[3]  = Warrior(1, 3)
@@ -180,13 +183,29 @@ class Board:
             self.game_tiles[93] = Warrior(2, 93)
             self.game_tiles[96] = Warrior(2, 96)
 
+        # 5x5 board.
+        elif(self.dim==5):
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[0]  = Warrior(1, 0)
+            self.game_tiles[2]  = Warrior(1, 2)
+            self.game_tiles[4]  = Warrior(1, 4)
+
+            # Add Warrior of tribe/player 1.
+            self.game_tiles[20]  = Warrior(2, 20)
+            self.game_tiles[22]  = Warrior(2, 22)
+            self.game_tiles[24]  = Warrior(2, 24)
+
+        # 4x4 board.
         elif(self.dim==4):
             # Add Warrior of tribe/player 1.
             self.game_tiles[0]  = Warrior(1, 0)
+            self.game_tiles[3]  = Warrior(1, 3)
 
             # Add Warrior of tribe/player 1.
+            self.game_tiles[12]  = Warrior(2, 12)
             self.game_tiles[15]  = Warrior(2, 15)
 
+        # 3x3 board.
         elif(self.dim==3):
             # Add Warrior of tribe/player 1.
             self.game_tiles[0]  = Warrior(1, 0)
