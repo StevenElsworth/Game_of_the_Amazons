@@ -121,9 +121,9 @@ class Game:
             available_plays = self.find_available_plays()
             if available_plays == {}:
                 if self.turn == '1':
-                    print('Player 2 has won the game in ' + str(self.turncount) + ' turns!')
+                    print('Player 2 has won the game in ' + str(self.turncount-1) + ' turns!')
                 else:
-                    print('Player 1 has won the game in ' + str(self.turncount) + ' turns!')
+                    print('Player 1 has won the game in ' + str(self.turncount-1) + ' turns!')
                 break
 
             while True:
